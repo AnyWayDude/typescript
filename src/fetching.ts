@@ -1,9 +1,7 @@
-import { BASE_IMG_URL, BASE_URL, POPULAR_URL, search_URL, topRated_URL, upcoming_URL } from "./API";
+import { BASE_IMG_URL, POPULAR_URL, search_URL, topRated_URL, upcoming_URL } from "./API";
 import { creatMovieCard } from "./movie-card";
 
 export const filmContainer: HTMLElement | null = document.getElementById('film-container');
-
-
 
 interface Movie {
     title: string,
@@ -64,23 +62,61 @@ export function displayRandomFilm(data: Movie[]) {
 
 }
 
-// function displayRandomFilm(data: Movie[]) {
-//     const randomArrIndex = Math.floor(Math.random() * data.length);
-//     data[randomArrIndex];
-//     const title = document.getElementById('random-movie-name')
-//     if (title) {
-//         title.innerHTML = data[randomArrIndex].title
-//     }
-// }
+const searchInput = (<HTMLInputElement | null>document.getElementById('search'));
 
+export const displaySearchFilms = (e: Event): void => {
+    e.preventDefault();
 
+    if (searchInput != null) {
+        const search = searchInput.value;
 
+        if (search) {
+            filmContainer?.replaceChildren()
+            getFilms(search_URL + '&query=' + search)
+        } else {
+            filmContainer?.replaceChildren()
+            getFilms(POPULAR_URL)
+        }
+
+    }
+
+}
+
+export const displayCategoriesFilms = (e: MouseEvent): void => {
+    const theTarget = e.target as HTMLElement
+
+    if (theTarget.id === 'popular') {
+        filmContainer?.replaceChildren()
+        getFilms(POPULAR_URL)
+    } else if (theTarget.id === 'upcoming') {
+        filmContainer?.replaceChildren()
+        getFilms(upcoming_URL)
+    } else if (theTarget.id === 'top_rated') {
+        filmContainer?.replaceChildren()
+        getFilms(topRated_URL)
+    }
+}
+
+export function displayPopularFilms(data: Films) {
+    data.results.forEach((film) => {
+
+        const filmImg = `${BASE_IMG_URL}/${film.poster_path}`
+
+        const FilmEl = document.createElement('div')
+        FilmEl.classList.add('col-lg-3', 'col-md-4', 'col-12', 'p-2')
+        FilmEl.innerHTML = creatMovieCard(filmImg, film.overview, film.release_date, film.id)
+        if (filmContainer != null) {
+            filmContainer.appendChild(FilmEl)
+            const favButton = document.getElementById(film.id)
+            favButton?.addEventListener('click', handleOnClick);
+        }
+    });
+}
 
 export function handleOnClick(event: any) {
     let arr: string[] = []
 
     console.log(event.target.id);
-
 
     const arrIdString = window.localStorage.getItem('movieId')
 
@@ -106,66 +142,18 @@ export function handleOnClick(event: any) {
     }
 
     window.localStorage.setItem('movieId', JSON.stringify(arr))
-
-
-
-
 }
 
+let pageNumber = 1
 
+export const loadMore = (e: MouseEvent): void => {
 
-export function displayPopularFilms(data: Films) {
-    data.results.forEach((film) => {
-
-        const filmImg = `${BASE_IMG_URL}/${film.poster_path}`
-
-        const FilmEl = document.createElement('div')
-        FilmEl.classList.add('col-lg-3', 'col-md-4', 'col-12', 'p-2')
-        FilmEl.innerHTML = creatMovieCard(filmImg, film.overview, film.release_date, film.id)
-        if (filmContainer != null) {
-            filmContainer.appendChild(FilmEl)
-            const favButton = document.getElementById(film.id)
-            favButton?.addEventListener('click', handleOnClick);
-
-        }
-    });
-}
-
-export const displayCategoriesFilms = (e: MouseEvent): void => {
     const theTarget = e.target as HTMLElement
 
-    if (theTarget.id === 'popular') {
-        filmContainer?.replaceChildren()
-        getFilms(POPULAR_URL)
-    } else if (theTarget.id === 'upcoming') {
-        filmContainer?.replaceChildren()
-        getFilms(upcoming_URL)
-    } else if (theTarget.id === 'top_rated') {
-        filmContainer?.replaceChildren()
-        getFilms(topRated_URL)
-    }
+    const filmEl = document.createElement('div');
 
-
-}
-
-const searchInput = (<HTMLInputElement | null>document.getElementById('search'));
-
-export const displaySearchFilms = (e: Event): void => {
-    e.preventDefault();
-
-    if (searchInput != null) {
-        const search = searchInput.value;
-
-        if (search) {
-            filmContainer?.replaceChildren()
-            getFilms(search_URL + '&query=' + search)
-        } else {
-            filmContainer?.replaceChildren()
-            getFilms(POPULAR_URL)
-        }
-
-    }
-
-}
-
-
+    if (theTarget.id === 'load-more' && filmContainer != null) {
+        filmContainer.appendChild(filmEl)
+        getFilms(POPULAR_URL + `&page=${pageNumber += 1}`)
+    };
+};
