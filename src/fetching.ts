@@ -148,11 +148,11 @@ let pageNumber = 1
 
 export const loadMore = (e: MouseEvent): void => {
 
-    const theTarget = e.target as HTMLElement
+    // const theTarget = e.target as HTMLElement
 
     const filmEl = document.createElement('div');
 
-    if (theTarget.id === 'load-more' && filmContainer != null) {
+    if (filmContainer != null) {
         filmContainer.appendChild(filmEl)
         getFilms(POPULAR_URL + `&page=${pageNumber += 1}`)
     };
