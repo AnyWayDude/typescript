@@ -1,5 +1,5 @@
 import { POPULAR_URL } from "./API";
-import { getFilms, displayPopularFilms, displaySearchFilms, displayCategoriesFilms, handleOnClick } from "./fetching";
+import { getFilms, displayPopularFilms, displaySearchFilms, displayCategoriesFilms, handleOnClick, loadMore } from "./fetching";
 
 export async function render(): Promise<void> {
     // TODO render your app here
@@ -15,8 +15,11 @@ export async function render(): Promise<void> {
     searchFilms?.addEventListener('click', displaySearchFilms);
 
     const favButton = document.getElementById('fav')
-
     favButton?.addEventListener('click', handleOnClick);
+
+    const loadMoreBtn = document.getElementById('load-more');
+    loadMoreBtn?.addEventListener('click', loadMore);
+
 
 
 
