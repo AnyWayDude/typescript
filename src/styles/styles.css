@@ -4,3 +4,9 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
 }
+
+.container-fluid {
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
