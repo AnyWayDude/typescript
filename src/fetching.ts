@@ -10,6 +10,7 @@ interface Movie {
     poster_path: string,
     overview: string,
     release_date: string,
+    backdrop_path: string,
     id: string
 }
 
@@ -22,8 +23,10 @@ export function getFilms(url: string): Promise<void> {
     return fetch(url).then(res => res.json()).then((data: Films) => {
         console.log(data.results)
         const movies = { pages: data.pages, results: returnFilms(data.results) }
-        displayPopularFilms(movies)
-    })
+        displayPopularFilms(movies);
+        displayRandomFilm(movies.results)
+
+    });
 
 }
 
@@ -34,10 +37,43 @@ function returnFilms(movies: Movie[]) {
             poster_path: result.poster_path,
             overview: result.overview,
             release_date: result.release_date,
+            backdrop_path: result.backdrop_path,
             id: result.id
         }
     });
 }
+
+export function displayRandomFilm(data: Movie[]) {
+    const randomArrIndex = Math.floor(Math.random() * data.length);
+    data[randomArrIndex];
+    const title = document.getElementById('random-movie-name');
+    if (title) {
+        title.innerHTML = data[randomArrIndex].title
+    }
+
+    const overview = document.getElementById('random-movie-description');
+    if (overview) {
+        overview.innerHTML = data[randomArrIndex].overview
+    }
+
+    const backgroundImg = document.getElementById('random-movie')
+    if (backgroundImg) {
+        backgroundImg.style.backgroundImage = ` url(${BASE_IMG_URL + data[randomArrIndex].backdrop_path
+            })`;
+    }
+
+}
+
+// function displayRandomFilm(data: Movie[]) {
+//     const randomArrIndex = Math.floor(Math.random() * data.length);
+//     data[randomArrIndex];
+//     const title = document.getElementById('random-movie-name')
+//     if (title) {
+//         title.innerHTML = data[randomArrIndex].title
+//     }
+// }
+
+
 
 
 export function handleOnClick(event: any) {
@@ -79,7 +115,7 @@ export function handleOnClick(event: any) {
 
 
 export function displayPopularFilms(data: Films) {
-    data.results.forEach((film: Movie) => {
+    data.results.forEach((film) => {
 
         const filmImg = `${BASE_IMG_URL}/${film.poster_path}`
 
@@ -92,9 +128,6 @@ export function displayPopularFilms(data: Films) {
             favButton?.addEventListener('click', handleOnClick);
 
         }
-
-
-
     });
 }
 
