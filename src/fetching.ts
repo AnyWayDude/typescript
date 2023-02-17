@@ -2,6 +2,8 @@ import { BASE_IMG_URL, POPULAR_URL, search_URL, topRated_URL, upcoming_URL } fro
 import { creatMovieCard } from "./movie-card";
 
 export const filmContainer: HTMLElement | null = document.getElementById('film-container');
+const filmFavContainer: HTMLElement | null = document.getElementById('favorite-movies')
+
 
 interface Movie {
     title: string,
@@ -23,9 +25,8 @@ export function getFilms(url: string): Promise<void> {
         const movies = { pages: data.pages, results: returnFilms(data.results) }
         displayPopularFilms(movies);
         displayRandomFilm(movies.results)
-
+        displayFavFilms(movies)
     });
-
 }
 
 function returnFilms(movies: Movie[]) {
@@ -37,6 +38,37 @@ function returnFilms(movies: Movie[]) {
             release_date: result.release_date,
             backdrop_path: result.backdrop_path,
             id: result.id
+        }
+    });
+}
+
+export function displayFavFilms(data: Films) {
+    let arr: string[] = []
+
+    const arrIdString = window.localStorage.getItem('movieId')
+
+    if (arrIdString != null && arrIdString.trim() != "") {
+        arr = JSON.parse(arrIdString)
+    }
+
+    const favMovies = data.results.filter((movie) => arr.includes(movie.id))
+
+
+    console.log("fooo", favMovies);
+
+
+
+
+    favMovies.forEach((film: Movie) => {
+
+        const filmImg = `${BASE_IMG_URL}/${film.poster_path}`
+
+        const FilmEl = document.createElement('div')
+        FilmEl.classList.add('col-12', 'p-2')
+        FilmEl.innerHTML = creatMovieCard(filmImg, film.overview, film.release_date, film.id)
+        if (filmFavContainer != null) {
+            filmFavContainer.appendChild(FilmEl)
+
         }
     });
 }
@@ -107,11 +139,11 @@ export function displayPopularFilms(data: Films) {
         FilmEl.innerHTML = creatMovieCard(filmImg, film.overview, film.release_date, film.id)
         if (filmContainer != null) {
             filmContainer.appendChild(FilmEl)
-            const favButton = document.getElementById(film.id)
-            favButton?.addEventListener('click', handleOnClick);
+
         }
     });
 }
+
 
 export function handleOnClick(event: any) {
     let arr: string[] = []
@@ -126,18 +158,24 @@ export function handleOnClick(event: any) {
 
     if (!arr.includes(event.target.id)) {
         arr.push(event.target.id)
-        const favButton = document.getElementById(event.target.id)
-        if (favButton) {
-            favButton.style.fill = 'red'
+
+        if (event.target !== event.currentTarget) {
+            const target = event.target;
+            target.style.fill = 'red';
+
         }
 
-    } else {
+
+    }
+    else {
         arr = arr.filter((id) => {
             return id != event.target.id;
         });
-        const favButton = document.getElementById(event.target.id)
-        if (favButton) {
-            favButton.style.fill = 'none'
+
+        if (event.target !== event.currentTarget) {
+            const target = event.target;
+            target.style.fill = 'transparent ';
+
         }
     }
 
